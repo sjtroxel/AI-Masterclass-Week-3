@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Compiled output
+dist/
+
+# Environment variables — never commit secrets
+.env
+.env.local
+.env.*.local
+
+# Editor artifacts
+.DS_Store
+*.log
+
+# Coverage reports
+coverage/
