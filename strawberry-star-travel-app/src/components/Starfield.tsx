@@ -22,18 +22,17 @@ export default function Starfield({
   gradient = "from-black via-gray-900 to-rose-950",
   className = "",
 }: StarfieldProps) {
-  const [stars] = React.useState<Star[]>(
-    () =>
-      Array.from({ length: numStars }, () => ({
-        size: Math.random() * 2 + 2.5,
-        top: Math.random() * 100,
-        left: Math.random() * 100,
-        delay: Math.random() * 6,
-        opacity: Math.random() * 0.5 + 0.6,
-        driftX: (Math.random() - 0.5) * 200,
-        driftY: (Math.random() - 0.5) * 200,
-        duration: 20 + Math.random() * 20,
-      }))
+  const [stars] = React.useState<Star[]>(() =>
+    Array.from({ length: numStars }, () => ({
+      size: Math.random() * 2 + 2.5,
+      top: Math.random() * 100,
+      left: Math.random() * 100,
+      delay: Math.random() * 6,
+      opacity: Math.random() * 0.5 + 0.6,
+      driftX: (Math.random() - 0.5) * 200,
+      driftY: (Math.random() - 0.5) * 200,
+      duration: 20 + Math.random() * 20,
+    }))
   );
 
   return (
@@ -44,19 +43,21 @@ export default function Starfield({
           <span
             key={i}
             className="absolute rounded-full bg-white"
-            style={{
-              width: `${star.size}px`,
-              height: `${star.size}px`,
-              top: `${star.top}%`,
-              left: `${star.left}%`,
-              opacity: star.opacity,
-              animation: `
+            style={
+              {
+                width: `${star.size}px`,
+                height: `${star.size}px`,
+                top: `${star.top}%`,
+                left: `${star.left}%`,
+                opacity: star.opacity,
+                animation: `
                 twinkle 2.5s ease-in-out ${star.delay}s infinite,
                 starDrift ${star.duration}s linear infinite
               `,
-              '--dx': `${star.driftX}px`,
-              '--dy': `${star.driftY}px`,
-            } as React.CSSProperties}
+                "--dx": `${star.driftX}px`,
+                "--dy": `${star.driftY}px`,
+              } as React.CSSProperties
+            }
           />
         ))}
       </div>

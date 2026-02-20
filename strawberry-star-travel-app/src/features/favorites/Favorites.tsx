@@ -2,7 +2,7 @@ import React from "react";
 import { useFavorites } from "../../hooks/useFavorites";
 import FavoritesItem from "./FavoritesItem";
 import starsDataJson from "../stars/data/stars.json";
-import Starfield from "../../components/Starfield"; 
+import Starfield from "../../components/Starfield";
 import type { Star } from "../stars/Star";
 
 export default function Favorites() {
@@ -16,11 +16,10 @@ export default function Favorites() {
 
   // Search & Sorting Controls
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [sortBy, setSortBy] = React.useState<
-    | {
-        key: "distanceLy" | "apparentMagnitude" | "name" | "spectralType";
-        direction: "asc" | "desc";
-      } | null>(null);
+  const [sortBy, setSortBy] = React.useState<{
+    key: "distanceLy" | "apparentMagnitude" | "name" | "spectralType";
+    direction: "asc" | "desc";
+  } | null>(null);
 
   const filteredStars = React.useMemo(() => {
     let results = [...favoriteStars];
@@ -61,17 +60,15 @@ export default function Favorites() {
     return results;
   }, [favoriteStars, searchQuery, sortBy]);
 
-  const loading = false; 
+  const loading = false;
 
   return (
     <main className="relative w-full min-h-screen overflow-x-hidden text-white pt-20">
-
       {/* Dark Purple Starfield */}
       <Starfield gradient="from-black to-purple-950" />
 
       {/* Main Content */}
       <section className="relative z-10 p-4 max-w-6xl mx-auto">
-
         {/* Title / Header With Fixed Padding */}
         <h1
           className="
@@ -92,7 +89,6 @@ export default function Favorites() {
         >
           Saving the brightest points in your universe!
         </p>
-
 
         {/* Controls (Search + Sort) */}
         <div
@@ -121,7 +117,7 @@ export default function Favorites() {
               if (!e.target.value) return setSortBy(null);
               const [key, direction] = e.target.value.split(":") as [
                 "distanceLy" | "apparentMagnitude" | "name" | "spectralType",
-                "asc" | "desc"
+                "asc" | "desc",
               ];
               setSortBy({ key, direction });
             }}
@@ -158,9 +154,7 @@ export default function Favorites() {
 
             {/* Empty State */}
             {filteredStars.length === 0 && (
-              <p className="text-center text-cyan-200 mt-10 text-xl">
-                No favorite stars found.
-              </p>
+              <p className="text-center text-cyan-200 mt-10 text-xl">No favorite stars found.</p>
             )}
           </>
         )}

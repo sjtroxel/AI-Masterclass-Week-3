@@ -19,7 +19,9 @@
   left: 50%;
   top: 50%;
   translate: -50% -50%;
-  transition: transform 0.8s ease, opacity 0.4s ease;
+  transition:
+    transform 0.8s ease,
+    opacity 0.4s ease;
 }
 
 .carousel-controls {
@@ -30,7 +32,7 @@
 
 .carousel-btn {
   font-size: 2.25rem;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.45);
   border-radius: 999px;
   width: 52px;
   height: 52px;

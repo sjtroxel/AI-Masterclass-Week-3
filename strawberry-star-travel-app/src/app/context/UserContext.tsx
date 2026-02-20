@@ -26,21 +26,14 @@ function UserProvider({ children }: { children: ReactNode }) {
     });
 
     // Listen for login/logout events
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
 
     return () => listener.subscription.unsubscribe();
   }, []);
 
-  return (
-    <UserContext.Provider value={{ user, loading }}>
-      {children}
-    </UserContext.Provider>
-  );
+  return <UserContext.Provider value={{ user, loading }}>{children}</UserContext.Provider>;
 }
 
-
-export { UserContext, UserProvider }
+export { UserContext, UserProvider };

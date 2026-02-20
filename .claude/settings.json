@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./.env*)",
+      "Read(./strawberry-star-travel-app/.env*)",
+      "Read(./strawberry-star-server/.env*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)"
+    ]
+  }
+}

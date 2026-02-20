@@ -46,7 +46,7 @@ export default function ShootingStars() {
 
   const handleAnimationEnd = () => {
     setStar(null); // remove old star
-    spawnStar();   // schedule new one
+    spawnStar(); // schedule new one
   };
 
   // initial spawn
@@ -56,8 +56,7 @@ export default function ShootingStars() {
 
   if (!star) return null;
 
-  const angle =
-    (Math.atan2(parseFloat(star.dy), parseFloat(star.dx)) * 180) / Math.PI;
+  const angle = (Math.atan2(parseFloat(star.dy), parseFloat(star.dx)) * 180) / Math.PI;
 
   return (
     <div className="shooting-stars-container">

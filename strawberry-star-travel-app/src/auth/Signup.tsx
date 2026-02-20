@@ -2,7 +2,7 @@ import React from "react";
 import { supabase } from "../supabaseClient";
 import { Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Starfield from "../components/Starfield"
+import Starfield from "../components/Starfield";
 
 export default function Signup() {
   const [username, setUsername] = React.useState("");
@@ -63,12 +63,9 @@ export default function Signup() {
     if (result.error) {
       setMessage(result.error.message);
     } else {
-      const newUsername =
-        result.data?.user?.user_metadata?.username || username;
+      const newUsername = result.data?.user?.user_metadata?.username || username;
 
-      setMessage(
-        `Signup successful, ${newUsername}!`
-      );
+      setMessage(`Signup successful, ${newUsername}!`);
       setSignupSuccess(true);
       setCountdown(15);
     }
@@ -100,7 +97,6 @@ export default function Signup() {
       clearTimeout(redirectTimer);
     };
   }, [signupSuccess, navigate]);
-
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center px-4 py-10 text-white overflow-hidden">
@@ -159,9 +155,7 @@ export default function Signup() {
                 className={`
                   absolute left-3 px-1 bg-gray-950/70 rounded-md 
                   text-gray-400 transition-all pointer-events-none
-                  ${field.value 
-                    ? "top-[-0.55rem] text-xs text-blue-300" 
-                    : "top-2.5 text-base"}
+                  ${field.value ? "top-[-0.55rem] text-xs text-blue-300" : "top-2.5 text-base"}
                   peer-focus:top-[-0.55rem] peer-focus:text-xs peer-focus:text-blue-300
                 `}
               >
@@ -186,9 +180,7 @@ export default function Signup() {
             <label
               className={`
                 absolute left-3 px-1 bg-gray-950/70 rounded-md text-gray-400 transition-all
-                ${password 
-                  ? "top-[-0.55rem] text-xs text-blue-300" 
-                  : "top-2.5 text-base"}
+                ${password ? "top-[-0.55rem] text-xs text-blue-300" : "top-2.5 text-base"}
                 peer-focus:top-[-0.55rem] peer-focus:text-xs peer-focus:text-blue-300
               `}
             >
@@ -220,9 +212,7 @@ export default function Signup() {
             <label
               className={`
                 absolute left-3 px-1 bg-gray-950/70 rounded-md text-gray-400 transition-all
-                ${confirmPassword 
-                  ? "top-[-0.55rem] text-xs text-blue-300" 
-                  : "top-2.5 text-base"}
+                ${confirmPassword ? "top-[-0.55rem] text-xs text-blue-300" : "top-2.5 text-base"}
                 peer-focus:top-[-0.55rem] peer-focus:text-xs peer-focus:text-blue-300
               `}
             >

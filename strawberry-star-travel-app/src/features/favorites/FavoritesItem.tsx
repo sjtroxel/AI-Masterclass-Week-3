@@ -21,13 +21,12 @@ export default function FavoritesItem({ star, removeFavorite }: FavoritesItemPro
 
   const wikiData = useWikipediaSummary(star);
 
-  const displayName =
-    star.name && star.name.trim() !== "" ? star.name : "Unnamed Star";
+  const displayName = star.name && star.name.trim() !== "" ? star.name : "Unnamed Star";
 
   const handleRemove = () => {
-  if (cardRef.current) {
-    const rect = cardRef.current.getBoundingClientRect();
-    setAnchorRect(rect); // set the rect here
+    if (cardRef.current) {
+      const rect = cardRef.current.getBoundingClientRect();
+      setAnchorRect(rect); // set the rect here
     }
     setShowConfirm(true);
   };
@@ -74,12 +73,10 @@ export default function FavoritesItem({ star, removeFavorite }: FavoritesItemPro
 
         <ul className="text-[#c8b7ff] text-sm space-y-1 flex-1">
           <li>
-            <span className="font-semibold text-[#a18be0]">Designation:</span>{" "}
-            {star.designation}
+            <span className="font-semibold text-[#a18be0]">Designation:</span> {star.designation}
           </li>
           <li>
-            <span className="font-semibold text-[#a18be0]">Spectral Type:</span>{" "}
-            {star.spectralType}
+            <span className="font-semibold text-[#a18be0]">Spectral Type:</span> {star.spectralType}
           </li>
           <li>
             <span className="font-semibold text-[#a18be0]">Distance:</span>{" "}
@@ -131,13 +128,13 @@ export default function FavoritesItem({ star, removeFavorite }: FavoritesItemPro
           </button>
         </div>
 
-      <ConfirmRemoveModal
-        star={star}
-        anchorRect={anchorRect!} // safe because we only render when showConfirm is true and anchorRect is set
-        isOpen={showConfirm && anchorRect !== null}
-        onCancel={() => setShowConfirm(false)}
-        onConfirm={confirmRemove}
-      />
+        <ConfirmRemoveModal
+          star={star}
+          anchorRect={anchorRect!} // safe because we only render when showConfirm is true and anchorRect is set
+          isOpen={showConfirm && anchorRect !== null}
+          onCancel={() => setShowConfirm(false)}
+          onConfirm={confirmRemove}
+        />
       </div>
 
       {isModalOpen && anchorRect && (

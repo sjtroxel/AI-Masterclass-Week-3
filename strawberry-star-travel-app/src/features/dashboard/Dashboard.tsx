@@ -11,13 +11,11 @@ export default function Dashboard() {
 
   return (
     <main className="relative w-full min-h-screen text-white overflow-x-hidden">
-
       {/* ⭐ Starfield with fiery gradient */}
       <Starfield gradient="from-black via-red-900 to-orange-900" />
 
       {/* MAIN CONTENT */}
       <section className="relative z-10 max-w-4xl mx-auto px-6 pt-32 pb-20 flex flex-col items-center">
-
         {/* 🔥 Large avatar with orange fire-glow */}
         <img
           src={avatarUrl || Strawberry}
@@ -47,7 +45,6 @@ export default function Dashboard() {
 
         {/* 🌋 Fiery Cards */}
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6 animate-fade-in-delayed-2">
-
           {[
             {
               title: "🌟 Browse Stars",
@@ -74,12 +71,8 @@ export default function Dashboard() {
                   hover:-translate-y-2 hover:border-orange-400/60 hover:shadow-[0_0_20px_rgba(255,140,50,0.7)]
                 "
               >
-                <h2 className="text-xl font-semibold mb-2 text-orange-300">
-                  {card.title}
-                </h2>
-                <p className="text-sm text-gray-200 pt-1 leading-relaxed">
-                  {card.text}
-                </p>
+                <h2 className="text-xl font-semibold mb-2 text-orange-300">{card.title}</h2>
+                <p className="text-sm text-gray-200 pt-1 leading-relaxed">{card.text}</p>
               </div>
             </Link>
           ))}
@@ -94,15 +87,11 @@ export default function Dashboard() {
                 hover:shadow-[0_0_20px_rgba(255,140,50,0.6)]
               "
             >
-              <h2 className="text-xl font-semibold mb-2 text-orange-300">
-                🌌 Galactic Map
-              </h2>
+              <h2 className="text-xl font-semibold mb-2 text-orange-300">🌌 Galactic Map</h2>
               <p className="text-sm text-gray-200 pt-1 leading-relaxed">
                 Soon you'll navigate your favorite stars on an interactive galactic map.
               </p>
-              <p className="mt-3 text-xs font-bold pt-1 italic text-orange-400">
-                Coming soon! 🔥
-              </p>
+              <p className="mt-3 text-xs font-bold pt-1 italic text-orange-400">Coming soon! 🔥</p>
             </div>
           </Link>
         </div>
@@ -135,7 +124,6 @@ export default function Dashboard() {
           }
         `}
       </style>
-
     </main>
   );
 }

@@ -3,7 +3,7 @@ import path from "path";
 import csv from "csv-parser";
 
 // Path to CSV file (relative to script)
-const inputFile = path.resolve("../hyg_v42.csv"); 
+const inputFile = path.resolve("../hyg_v42.csv");
 const outputFile = path.resolve("./stars.json");
 
 const results = [];
@@ -23,7 +23,7 @@ fs.createReadStream(inputFile)
       apparentMagnitude: parseFloat(data.mag) || 0,
       x: parseFloat(data.x) || 0,
       y: parseFloat(data.y) || 0,
-      z: parseFloat(data.z) || 0
+      z: parseFloat(data.z) || 0,
     };
     results.push(star);
   })

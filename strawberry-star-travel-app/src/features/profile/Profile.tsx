@@ -25,11 +25,11 @@ export default function Profile() {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", "strawberry-avatars");
+    formData.append("upload_preset", import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
 
     try {
       const response = await fetch(
-        "https://api.cloudinary.com/v1_1/diiapd2pv/image/upload",
+        `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`,
         { method: "POST", body: formData }
       );
 
@@ -84,7 +84,9 @@ export default function Profile() {
 
       {/* Glass-card container */}
       <div className="w-full max-w-md bg-gray-950/70 backdrop-blur-xl border border-red-700/40 rounded-2xl p-5 shadow-xl z-10 mt-10">
-        <h2 className="text-center text-3xl font-bold text-zinc-100 mb-6 pb-2">Profile Preferences</h2>
+        <h2 className="text-center text-3xl font-bold text-zinc-100 mb-6 pb-2">
+          Profile Preferences
+        </h2>
 
         {/* Avatar Section */}
         <div className="flex flex-col items-center mb-6">
@@ -95,12 +97,7 @@ export default function Profile() {
           />
           <label className="mt-2 bg-red-800 hover:bg-red-950 shadow-lg active:scale-[.98] transition tracking-wide shadow-red-600/30 font-semibold px-3 py-1 mb-1 rounded-lg cursor-pointer">
             Upload Avatar
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleAvatarUpload}
-              className="hidden"
-            />
+            <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
           </label>
         </div>
 
@@ -134,9 +131,7 @@ export default function Profile() {
             />
             <label
               className={`absolute left-3 px-1 bg-gray-950/70 rounded-md text-gray-400 transition-all pointer-events-none ${
-                field.value
-                  ? "top-[-0.55rem] text-xs text-red-300"
-                  : "top-2.5 text-base"
+                field.value ? "top-[-0.55rem] text-xs text-red-300" : "top-2.5 text-base"
               } peer-focus:top-[-0.55rem] peer-focus:text-xs peer-focus:text-red-300`}
             >
               {field.label}

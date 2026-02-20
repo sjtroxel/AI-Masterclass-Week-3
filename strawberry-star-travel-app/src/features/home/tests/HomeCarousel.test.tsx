@@ -25,9 +25,7 @@ describe("HomeCarousel (desktop)", () => {
     render(<HomeCarousel onFeatureClick={() => {}} />);
 
     // At least the first feature title should appear
-    expect(
-      screen.getByText(homeFeatures[0].title)
-    ).toBeInTheDocument();
+    expect(screen.getByText(homeFeatures[0].title)).toBeInTheDocument();
   });
 
   it("rotates right when clicking the R button", async () => {
@@ -36,17 +34,13 @@ describe("HomeCarousel (desktop)", () => {
     render(<HomeCarousel onFeatureClick={() => {}} />);
 
     // Initial feature
-    expect(
-      screen.getByText(homeFeatures[0].title)
-    ).toBeInTheDocument();
+    expect(screen.getByText(homeFeatures[0].title)).toBeInTheDocument();
 
     // Rotate right
     await user.click(screen.getByText("R"));
 
     // Next feature should now be visible
-    expect(
-      screen.getByText(homeFeatures[1].title)
-    ).toBeInTheDocument();
+    expect(screen.getByText(homeFeatures[1].title)).toBeInTheDocument();
   });
 
   it("calls onFeatureClick when a card is clicked", async () => {
@@ -55,13 +49,9 @@ describe("HomeCarousel (desktop)", () => {
 
     render(<HomeCarousel onFeatureClick={onFeatureClick} />);
 
-    await user.click(
-      screen.getByText(homeFeatures[0].title)
-    );
+    await user.click(screen.getByText(homeFeatures[0].title));
 
     expect(onFeatureClick).toHaveBeenCalledTimes(1);
-    expect(onFeatureClick).toHaveBeenCalledWith(
-      homeFeatures[0].title
-    );
+    expect(onFeatureClick).toHaveBeenCalledWith(homeFeatures[0].title);
   });
 });

@@ -7,8 +7,9 @@ import Strawberry from "../../styles/Strawberry.png";
 import HomeCarousel from "./components/HomeCarousel";
 
 export default function Home() {
-
-  {/* "Locked" Feature Teaser Modal */}
+  {
+    /* "Locked" Feature Teaser Modal */
+  }
   const [lockedFeature, setLockedFeature] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -17,7 +18,9 @@ export default function Home() {
     return () => clearTimeout(t);
   }, [lockedFeature]);
 
-  {/* Scroll Hide */}
+  {
+    /* Scroll Hide */
+  }
   const [hideScroll, setHideScroll] = React.useState(false);
 
   React.useEffect(() => {
@@ -34,7 +37,9 @@ export default function Home() {
     };
   }, []);
 
-  {/* Typewriter Tagline */}
+  {
+    /* Typewriter Tagline */
+  }
   const line1 = "Discover real stars.";
   const line2 = "Remember the ones that call to you.";
 
@@ -66,7 +71,9 @@ export default function Home() {
     return () => clearInterval(typeLine1);
   }, []);
 
-  {/* Star Facts */}
+  {
+    /* Star Facts */
+  }
   // const [starFact, setStarFact] = React.useState("");
 
   // React.useEffect(() => {
@@ -82,7 +89,6 @@ export default function Home() {
 
       {/* Hero section */}
       <section className="relative min-h-screen w-full flex flex-col items-center justify-center px-6 text-center z-10">
-        
         <div className="relative inline-block">
           {/* Lens flare */}
           <div className="lens-flare" aria-hidden />
@@ -105,56 +111,56 @@ export default function Home() {
           </h1>
         </div>
 
-      {/* Avatar + Tagline group */}
+        {/* Avatar + Tagline group */}
         <div className="flex flex-col items-center translate-y-9 sm:translate-y-12">
-
-        {/* 🐱 Strawberry’s cosmic floating avatar */}
-        <img
-          src={Strawberry}
-          alt="Strawberry the cat"
-          className="
+          {/* 🐱 Strawberry’s cosmic floating avatar */}
+          <img
+            src={Strawberry}
+            alt="Strawberry the cat"
+            className="
             w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover
             border-2 border-red-500 shadow-xl
             animate-[float_4s_ease-in-out_infinite,glow_3s_ease-in-out_infinite] mb-2"
-        />
+          />
 
-        {/* Typewriter Tagline */}
-        <p
-          className="
-            max-w-md sm:max-w-xl text-base sm:text-lg
-            font-semibold italic text-gray-100 min-h-3.5rem mt-6">
-          <span className="block">{typedLine1}</span>
-          <span className="block">{typedLine2}</span>
-        </p>
-
-        {/* Primary CTA */}
-        <div className="mt-5 flex flex-col items-center gap-5">
-          <a
-            href="/signup"
+          {/* Typewriter Tagline */}
+          <p
             className="
+            max-w-md sm:max-w-xl text-base sm:text-lg
+            font-semibold italic text-gray-100 min-h-3.5rem mt-6"
+          >
+            <span className="block">{typedLine1}</span>
+            <span className="block">{typedLine2}</span>
+          </p>
+
+          {/* Primary CTA */}
+          <div className="mt-5 flex flex-col items-center gap-5">
+            <a
+              href="/signup"
+              className="
               px-6 py-2 rounded-full font-bold text-sm sm:text-base
               bg-linear-to-r from-pink-700 via-rose-700 to-fuchsia-700
               text-zinc-300 shadow-[0_0_20px_rgba(255,120,200,0.6)]
               hover:scale-105 active:scale-100 transition-transform
             "
-          >
-            Begin Your Journey
-          </a>
-          <div className="flex justify-center mb-8">
-            <p
-              className="
+            >
+              Begin Your Journey
+            </a>
+            <div className="flex justify-center mb-8">
+              <p
+                className="
                 inline-block text-xs font-semibold italic text-slate-100
                 px-4 py-1.5 rounded-full
                 bg-black/30 border border-sky-400/30
                 backdrop-blur-sm
                 shadow-[0_0_12px_rgba(100,200,255,0.15)]
               "
-            >
-              Sign up for free to explore stars and unlock features!
-            </p>
+              >
+                Sign up for free to explore stars and unlock features!
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
         {/* Scroll Indicator */}
         <div
@@ -168,34 +174,29 @@ export default function Home() {
 
       {/* Features */}
       <section className="relative w-full py-28 z-10">
-
-      {/* 2a — one-line explanation ABOVE the grid */}
-      <div className="flex justify-center mb-6">
-        <p
-          className="
+        {/* 2a — one-line explanation ABOVE the grid */}
+        <div className="flex justify-center mb-6">
+          <p
+            className="
             inline-block text-xs font-semibold italic text-sky-100
             px-4 py-1.5 rounded-full
             bg-black/30 border border-sky-400/30
             backdrop-blur-sm
             shadow-[0_0_12px_rgba(100,200,255,0.15)]
           "
-        >
-          Unlock the below features by creating a free account!
-        </p>
-      </div>
+          >
+            Unlock the below features by creating a free account!
+          </p>
+        </div>
 
-      <div className="mt-8 flex justify-center">
-        <HomeCarousel
-          onFeatureClick={(title) => setLockedFeature(title)}
-        />
-      </div>
+        <div className="mt-8 flex justify-center">
+          <HomeCarousel onFeatureClick={(title) => setLockedFeature(title)} />
+        </div>
       </section>
 
       {/* Post-features CTA */}
       <div className="relative z-10 py-20 flex flex-col items-center gap-4">
-        <p className="text-lg font-semibold text-gray-200">
-          Ready to explore for real?
-        </p>
+        <p className="text-lg font-semibold text-gray-200">Ready to explore for real?</p>
 
         <a
           href="/signup"
@@ -209,7 +210,6 @@ export default function Home() {
           Create Free Account
         </a>
       </div>
-
 
       {/* Footer */}
       <footer className="py-8 text-center text-lg text-gray-200 font-semibold z-10">
@@ -238,21 +238,19 @@ export default function Home() {
             </svg>
           </a>
         </span>
-       . All rights reserved.
+        . All rights reserved.
       </footer>
 
-    {lockedFeature && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
-        <div className="bg-black/70 backdrop-blur-sm rounded-xl px-6 py-4 border border-pink-400/40 shadow-xl text-center animate-fadeIn">
-          <p className="text-lg font-bold text-pink-300 mb-1">
-            {lockedFeature}
-          </p>
-          <p className="text-sm text-gray-200 italic">
-            This feature unlocks when you create a free account!
-          </p>
+      {lockedFeature && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="bg-black/70 backdrop-blur-sm rounded-xl px-6 py-4 border border-pink-400/40 shadow-xl text-center animate-fadeIn">
+            <p className="text-lg font-bold text-pink-300 mb-1">{lockedFeature}</p>
+            <p className="text-sm text-gray-200 italic">
+              This feature unlocks when you create a free account!
+            </p>
+          </div>
         </div>
-      </div>
-    )}
+      )}
 
       {/* Custom keyframes */}
       <style>

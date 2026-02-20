@@ -11,11 +11,9 @@ export default function HomeCarousel({ onFeatureClick }: Props) {
   const [index, setIndex] = React.useState(0);
   const isMobile = window.matchMedia("(max-width: 480px)").matches;
 
-  const rotateLeft = () =>
-    setIndex((i) => (i - 1 + homeFeatures.length) % homeFeatures.length);
+  const rotateLeft = () => setIndex((i) => (i - 1 + homeFeatures.length) % homeFeatures.length);
 
-  const rotateRight = () =>
-    setIndex((i) => (i + 1) % homeFeatures.length);
+  const rotateRight = () => setIndex((i) => (i + 1) % homeFeatures.length);
 
   // 📱 MOBILE: simple stacked list
   if (isMobile) {
@@ -51,18 +49,19 @@ export default function HomeCarousel({ onFeatureClick }: Props) {
                 opacity: Math.abs(offset) > 2 ? 0 : 1,
               }}
             >
-              <HomeFeatureCard
-                feature={feature}
-                onClick={() => onFeatureClick(feature.title)}
-              />
+              <HomeFeatureCard feature={feature} onClick={() => onFeatureClick(feature.title)} />
             </div>
           );
         })}
       </div>
 
       <div className="carousel-controls">
-        <button onClick={rotateLeft} className="carousel-btn">L</button>
-        <button onClick={rotateRight} className="carousel-btn">R</button>
+        <button onClick={rotateLeft} className="carousel-btn">
+          L
+        </button>
+        <button onClick={rotateRight} className="carousel-btn">
+          R
+        </button>
       </div>
     </div>
   );

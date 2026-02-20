@@ -67,15 +67,9 @@ export default function Login() {
 
       {/* Login Form */}
       <div className="w-full max-w-sm bg-gray-950/70 backdrop-blur-xl border border-gray-700/40 rounded-2xl p-5 shadow-2xl z-10">
-        <h1 className="text-center text-xl font-bold tracking-wide mb-6 pb-4">
-          Log In
-        </h1>
+        <h1 className="text-center text-xl font-bold tracking-wide mb-6 pb-4">Log In</h1>
 
-        <form
-          onSubmit={handleLogin}
-          autoComplete="off"
-          className="flex flex-col gap-5"
-        >
+        <form onSubmit={handleLogin} autoComplete="off" className="flex flex-col gap-5">
           {/* Email Field */}
           <div className="relative">
             <input

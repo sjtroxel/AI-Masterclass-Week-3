@@ -11,7 +11,13 @@ interface Props {
   onCancel: () => void;
 }
 
-export default function ConfirmRemoveModal({ star, anchorRect, isOpen, onConfirm, onCancel }: Props) {
+export default function ConfirmRemoveModal({
+  star,
+  anchorRect,
+  isOpen,
+  onConfirm,
+  onCancel,
+}: Props) {
   if (!isOpen) return null;
 
   const style: React.CSSProperties = {
@@ -40,9 +46,7 @@ export default function ConfirmRemoveModal({ star, anchorRect, isOpen, onConfirm
           alt="Strawberry the cat"
           className="w-12 h-12 rounded-full border-2 border-fuchsia-400 shadow-md"
         />
-        <h2 className="text-xl font-bold text-fuchsia-200">
-          Mew! Mew! MEOW!
-        </h2>
+        <h2 className="text-xl font-bold text-fuchsia-200">Mew! Mew! MEOW!</h2>
       </div>
 
       {/* Confirm text with conditional star name */}

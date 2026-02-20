@@ -21,9 +21,7 @@ export default function HomeFeatureCard({ feature, onClick }: Props) {
     >
       <div className="text-3xl mb-2">{feature.icon}</div>
       <h3 className="text-lg font-bold">{feature.title}</h3>
-      <p className="text-sm text-cyan-50 mt-1">
-        {feature.description}
-      </p>
+      <p className="text-sm text-cyan-50 mt-1">{feature.description}</p>
     </button>
   );
 }
