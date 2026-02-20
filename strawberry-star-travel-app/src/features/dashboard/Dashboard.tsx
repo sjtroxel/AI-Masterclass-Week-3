@@ -2,6 +2,7 @@ import { useUser } from "../../hooks/useUser";
 import { Link } from "react-router-dom";
 import Starfield from "../../components/Starfield";
 import Strawberry from "../../styles/Strawberry.png";
+import ServerStatusBadge from "./components/ServerStatusBadge";
 
 export default function Dashboard() {
   const { user } = useUser();
@@ -42,6 +43,10 @@ export default function Dashboard() {
         <p className="mt-4 max-w-md text-gray-200 font-semibold leading-relaxed text-base sm:text-lg text-center pt-4 italic animate-fade-in-delayed">
           Your mission console is online — select a destination or manage your star logs.
         </p>
+
+        <div className="mt-3 animate-fade-in-delayed">
+          <ServerStatusBadge />
+        </div>
 
         {/* 🌋 Fiery Cards */}
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6 animate-fade-in-delayed-2">
