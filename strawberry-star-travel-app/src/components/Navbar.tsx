@@ -1,19 +1,20 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { supabase } from "../supabaseClient";
 import { useUser } from "../hooks/useUser";
+import { useAuth } from "../app/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Strawberry from "../styles/Strawberry.png";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const { user } = useUser();
-  const username = user?.user_metadata?.username;
-  const avatar = user?.user_metadata?.avatar;
+  const { logout } = useAuth();
+  const username = user?.username;
+  const avatar: string | undefined = undefined; // avatar deferred to Phase 4
   const [menuOpen, setMenuOpen] = React.useState(false);
 
-  async function handleLogout() {
-    await supabase.auth.signOut();
+  function handleLogout() {
+    logout();
     setMenuOpen(false);
     navigate("/", { replace: true });
   }

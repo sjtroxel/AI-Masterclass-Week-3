@@ -1,15 +1,15 @@
 import React from "react";
 import { useUser } from "../../hooks/useUser";
-import { supabase } from "../../supabaseClient";
 import Starfield from "../../components/Starfield";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function Profile() {
   const { user } = useUser();
-  const [username, setUsername] = React.useState(user?.user_metadata?.username || "");
-  const [firstName, setFirstName] = React.useState(user?.user_metadata?.firstName || "");
-  const [lastName, setLastName] = React.useState(user?.user_metadata?.lastName || "");
-  const [avatar, setAvatar] = React.useState(user?.user_metadata?.avatar || "");
+  // user_metadata fields deferred to Phase 4 — backend profile endpoint not yet implemented
+  const [username, setUsername] = React.useState(user?.username || "");
+  const [firstName, setFirstName] = React.useState("");
+  const [lastName, setLastName] = React.useState("");
+  const [avatar] = React.useState(""); // avatar upload deferred to Phase 4
   const [newPassword, setNewPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
   const [message, setMessage] = React.useState("");
@@ -18,45 +18,14 @@ export default function Profile() {
   const [showNewPassword, setShowNewPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
-  // Upload Avatar to Cloudinary
-  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
-
-    try {
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`,
-        { method: "POST", body: formData }
-      );
-
-      const data = await response.json();
-
-      if (data.secure_url) {
-        setAvatar(data.secure_url);
-
-        await supabase.auth.updateUser({ data: { avatar: data.secure_url } });
-        setMessage("Avatar updated!");
-      }
-    } catch {
-      setMessage("Error uploading avatar.");
-    }
-  }
-
-  // Update Profile Fields
-  async function handleUpdateProfile() {
+  // Update Profile Fields — deferred to Phase 4
+  function handleUpdateProfile() {
     if (!user) return;
-    const { error } = await supabase.auth.updateUser({
-      data: { username, firstName, lastName },
-    });
-    setMessage(error ? error.message : "Profile updated successfully!");
+    setMessage("Profile updates coming in Phase 4.");
   }
 
-  // Change Password
-  async function handleChangePassword() {
+  // Change Password — deferred to Phase 4
+  function handleChangePassword() {
     if (!user) return;
     if (!newPassword) {
       setMessage("Please enter a new password.");
@@ -66,15 +35,7 @@ export default function Profile() {
       setMessage("Passwords do not match.");
       return;
     }
-
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
-    if (error) {
-      setMessage(error.message);
-    } else {
-      setMessage("Password updated successfully!");
-      setNewPassword("");
-      setConfirmPassword("");
-    }
+    setMessage("Password change coming in Phase 4.");
   }
 
   return (
@@ -95,10 +56,7 @@ export default function Profile() {
             alt=""
             className="w-27 h-27 rounded-full object-cover border-3 border-red-800 shadow-md mb-1"
           />
-          <label className="mt-2 bg-red-800 hover:bg-red-950 shadow-lg active:scale-[.98] transition tracking-wide shadow-red-600/30 font-semibold px-3 py-1 mb-1 rounded-lg cursor-pointer">
-            Upload Avatar
-            <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
-          </label>
+          <p className="mt-2 text-xs text-gray-400 italic">Avatar upload coming in Phase 4.</p>
         </div>
 
         {/* Email (read-only) */}

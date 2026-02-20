@@ -1,8 +1,8 @@
 import React from "react";
-import { supabase } from "../supabaseClient";
 import { Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Starfield from "../components/Starfield";
+import { useAuth } from "../app/context/AuthContext";
 
 export default function Signup() {
   const [username, setUsername] = React.useState("");
@@ -13,6 +13,7 @@ export default function Signup() {
   const [confirmPassword, setConfirmPassword] = React.useState("");
 
   const navigate = useNavigate();
+  const { register } = useAuth();
   const [signupSuccess, setSignupSuccess] = React.useState(false);
 
   const [showPassword, setShowPassword] = React.useState(false);
@@ -52,25 +53,16 @@ export default function Signup() {
       return;
     }
 
-    const result = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { username, firstName, lastName },
-      },
-    });
-
-    if (result.error) {
-      setMessage(result.error.message);
-    } else {
-      const newUsername = result.data?.user?.user_metadata?.username || username;
-
-      setMessage(`Signup successful, ${newUsername}!`);
+    try {
+      await register(email, password, username);
+      setMessage(`Signup successful, ${username}!`);
       setSignupSuccess(true);
       setCountdown(15);
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Signup failed");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   React.useEffect(() => {

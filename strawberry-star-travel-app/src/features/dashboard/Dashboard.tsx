@@ -7,8 +7,8 @@ import ServerStatusBadge from "./components/ServerStatusBadge";
 export default function Dashboard() {
   const { user } = useUser();
 
-  const username = user?.user_metadata?.username;
-  const avatarUrl = user?.user_metadata?.avatar;
+  const username = user?.username;
+  const avatarUrl: string | undefined = undefined; // avatar deferred to Phase 4
 
   return (
     <main className="relative w-full min-h-screen text-white overflow-x-hidden">

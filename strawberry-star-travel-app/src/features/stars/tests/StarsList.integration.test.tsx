@@ -2,14 +2,15 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect } from "vitest";
 import StarsList from "../StarsList";
-import { UserProvider } from "../../../app/context/UserContext";
+import { AuthProvider } from "../../../app/context/AuthContext";
 
 describe("StarsList integration", () => {
   it("renders the stars list and search input", async () => {
     render(
-        <UserProvider>
-            <StarsList />
-        </UserProvider>    );
+      <AuthProvider>
+        <StarsList />
+      </AuthProvider>
+    );
 
     // Search input should exist
     const searchInput = screen.getByPlaceholderText("Search stars...");
@@ -22,9 +23,10 @@ describe("StarsList integration", () => {
 
   it("filters stars when typing in search input", async () => {
     render(
-        <UserProvider>
-            <StarsList />
-        </UserProvider>    );
+      <AuthProvider>
+        <StarsList />
+      </AuthProvider>
+    );
 
     const searchInput = screen.getByPlaceholderText("Search stars...");
 

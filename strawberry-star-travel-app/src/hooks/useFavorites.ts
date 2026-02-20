@@ -1,3 +1,6 @@
+// TODO (Phase 4): This hook still uses Supabase DB queries.
+// Post JWT migration, Supabase RLS blocks queries since there is no Supabase auth session.
+// Favorites will be migrated to a dedicated Express endpoint in Phase 4.
 import React from "react";
 import { supabase } from "../supabaseClient";
 import type { Star } from "../features/stars/Star";

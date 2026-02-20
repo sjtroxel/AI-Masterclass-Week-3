@@ -1,9 +1,10 @@
-import { useContext } from "react"
-import { UserContext } from "../app/context/UserContext";
+import { useContext } from "react";
+import { AuthContext } from "../app/context/AuthContext";
+
 export function useUser() {
-  const ctx = useContext(UserContext)
+  const ctx = useContext(AuthContext);
   if (!ctx) {
-    throw new Error("useUser must be used inside <UserProvider>")
+    throw new Error("useUser must be used inside <AuthProvider>");
   }
-  return ctx;
+  return { user: ctx.user, loading: ctx.loading };
 }
