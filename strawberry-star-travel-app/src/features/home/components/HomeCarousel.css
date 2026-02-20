@@ -1,0 +1,38 @@
+.home-carousel {
+  position: relative;
+  width: 100%;
+  perspective: 1000px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.carousel-ring {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  transform-style: preserve-3d;
+}
+
+.carousel-item {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  transition: transform 0.8s ease, opacity 0.4s ease;
+}
+
+.carousel-controls {
+  margin-top: 2.5rem;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.carousel-btn {
+  font-size: 2.25rem;
+  background: rgba(0,0,0,0.45);
+  border-radius: 999px;
+  width: 52px;
+  height: 52px;
+  color: white;
+}

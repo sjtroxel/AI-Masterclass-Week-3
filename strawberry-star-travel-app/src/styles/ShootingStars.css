@@ -1,0 +1,44 @@
+.shooting-stars-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 30;
+  overflow: hidden;
+}
+
+.shooting-star {
+  position: absolute;
+  width: 140px;
+  height: 4px;
+
+  /* tail → head gradient: head will lead along motion vector */
+  background: linear-gradient(
+    to left,
+   rgba(255, 255, 255, 1) 0%,
+   rgba(255, 255, 255, 0.9) 20%,
+   rgba(255, 255, 255, 0.5) 50%,
+   rgba(255, 255, 255, 0) 100%
+  );
+
+  border-radius: 999px;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9));
+
+  animation-name: shoot;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+
+  /* rotation along the motion vector */
+  transform: rotate(var(--angle, 0deg));
+}
+
+@keyframes shoot {
+  from {
+    transform: translate3d(0, 0, 0) rotate(var(--angle, 0deg));
+    opacity: 1;
+  }
+
+  to {
+    transform: translate3d(var(--dx), var(--dy), 0) rotate(var(--angle, 0deg));
+    opacity: 0;
+  }
+}
