@@ -1,32 +1,27 @@
-// TODO (Phase 4): This hook still uses Supabase DB queries.
-// Post JWT migration, Supabase RLS blocks queries since there is no Supabase auth session.
-// Favorites will be migrated to a dedicated Express endpoint in Phase 4.
 import React from "react";
-import { supabase } from "../supabaseClient";
 import type { Star } from "../features/stars/Star";
-import { useUser } from "./useUser";
+import { useAuth } from "../app/context/AuthContext";
 
-  // Types
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
-interface FavoriteRow {
-  star_id: string;
+interface FavoritesResponse {
+  starIds: number[];
 }
 
-interface SupabaseError {
-  code?: string;
-  message?: string;
+interface ToggleResponse {
+  favorited: boolean;
+  starId: number;
 }
 
 export function useFavorites() {
-  const { user } = useUser();
+  const { user, token } = useAuth();
 
-  // State for favorites
   const [favorites, setFavorites] = React.useState<number[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
-  
-  // Load user's favorites from Supabase
+
+  // Load favorites from backend on mount / when token changes
   React.useEffect(() => {
-    if (!user) {
+    if (!token) {
       setFavorites([]);
       setLoading(false);
       return;
@@ -37,24 +32,18 @@ export function useFavorites() {
     const load = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
-          .from("user_favorites")
-          .select("star_id")
-          .eq("user_id", user.id);
+        const res = await fetch(`${API_URL}/api/favorites`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-        if (error) {
-          console.error("Error loading favorites:", error);
-        } else if (!cancelled && data) {
-          const rows = data as FavoriteRow[];
-          const ids = rows
-            .map((r) => {
-              // Try to parse numeric id, fall back to NaN
-              const parsed = Number(r.star_id);
-              return Number.isFinite(parsed) ? parsed : null;
-            })
-            .filter((n): n is number => n !== null);
+        if (!res.ok) {
+          console.error("Error loading favorites:", res.status);
+          return;
+        }
 
-          setFavorites(ids);
+        const data = (await res.json()) as FavoritesResponse;
+        if (!cancelled) {
+          setFavorites(data.starIds);
         }
       } catch (err) {
         console.error("Unexpected error loading favorites:", err);
@@ -68,31 +57,31 @@ export function useFavorites() {
     return () => {
       cancelled = true;
     };
-  }, [user]);
+  }, [token]);
 
-  // Add a favorite (stores star_id as string in DB)
   const addFavorite = async (star: Star) => {
-    if (!user) {
+    if (!user || !token) {
       console.warn("Not logged in: cannot add favorite");
       return;
     }
 
     try {
-      const { error } = await supabase
-        .from("user_favorites")
-        .insert({
-          user_id: user.id,
-          star_id: String(star.id),
-        });
+      const res = await fetch(`${API_URL}/api/favorites/toggle`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ starId: star.id }),
+      });
 
-      if (error) {
-        const e = error as SupabaseError;
-        // silently ignore duplicate insert
-        if (e.code === "PGRST116" || e.message?.includes("duplicate")) {
-          return;
-        }
-         console.error("Error inserting favorite:", e);
-      } else {
+      if (!res.ok) {
+        console.error("Error adding favorite:", res.status);
+        return;
+      }
+
+      const data = (await res.json()) as ToggleResponse;
+      if (data.favorited) {
         setFavorites((prev) => (prev.includes(star.id) ? prev : [...prev, star.id]));
       }
     } catch (err) {
@@ -100,23 +89,29 @@ export function useFavorites() {
     }
   };
 
-  // Remove a favorite
   const removeFavorite = async (starId: number) => {
-    if (!user) {
+    if (!user || !token) {
       console.warn("Not logged in: cannot remove favorite");
       return;
     }
 
     try {
-      const { error } = await supabase
-        .from("user_favorites")
-        .delete()
-        .eq("user_id", user.id)
-        .eq("star_id", String(starId));
+      const res = await fetch(`${API_URL}/api/favorites/toggle`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ starId }),
+      });
 
-      if (error) {
-        console.error("Error deleting favorite:", error);
-      } else {
+      if (!res.ok) {
+        console.error("Error removing favorite:", res.status);
+        return;
+      }
+
+      const data = (await res.json()) as ToggleResponse;
+      if (!data.favorited) {
         setFavorites((prev) => prev.filter((id) => id !== starId));
       }
     } catch (err) {
@@ -127,7 +122,7 @@ export function useFavorites() {
   const isFavorite = (starId: number) => favorites.includes(starId);
 
   return {
-    favorites,       // number[] of star ids
+    favorites,
     loading,
     addFavorite,
     removeFavorite,

@@ -1,7 +1,8 @@
 import { Router } from "express";
 import type { Request, Response, NextFunction } from "express";
 import { hash, compare } from "bcryptjs";
-import { sign } from "jsonwebtoken";
+import jwt from "jsonwebtoken"; // ✅ Import the whole default object
+const { sign } = jwt;           // ✅ Destructure the sign function from it
 import { UserModel } from "../models/User.js";
 import type { LoginBody, RegisterBody, AuthResponse, JwtPayload } from "../types/auth.js";
 

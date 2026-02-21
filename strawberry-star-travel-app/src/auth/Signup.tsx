@@ -81,7 +81,7 @@ export default function Signup() {
 
     // Redirect at 15 seconds
     const redirectTimer = setTimeout(() => {
-      navigate("/");
+      navigate("/dashboard");
     }, 15000);
 
     return () => {
@@ -238,7 +238,7 @@ export default function Signup() {
             {message}
             {signupSuccess && (
               <span className="block text-blue-300 mt-2">
-                Redirecting to home in T-{countdown} seconds...
+                Redirecting to dashboard in T-{countdown} seconds...
               </span>
             )}
           </p>

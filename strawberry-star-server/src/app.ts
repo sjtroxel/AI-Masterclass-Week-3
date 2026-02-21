@@ -3,6 +3,7 @@ import cors from "cors";
 import { healthRouter } from "./routes/health.js";
 import { statusRouter } from "./routes/status.js";
 import { authRouter } from "./routes/auth.js";
+import { favoritesRouter } from "./routes/favorites.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN ?? "http://localhost:5173";
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use("/health", healthRouter);
 app.use("/api/status", statusRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/favorites", favoritesRouter);
 
 // --- Global error handler (must be last) ---
 app.use(errorHandler);
