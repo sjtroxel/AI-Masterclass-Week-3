@@ -23,8 +23,7 @@ export default function StarItem({ star, favorites }: StarItemProps) {
 
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // Always call hooks unconditionally — this is now safe.
-  const wikiData = useWikipediaSummary(star);
+  const wikiData = useWikipediaSummary(star, isModalOpen);
 
   const displayName =
     star.name && star.name.trim() !== "" ? star.name : "Unnamed Star";

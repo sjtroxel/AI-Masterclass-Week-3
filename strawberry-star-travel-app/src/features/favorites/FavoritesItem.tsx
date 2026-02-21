@@ -19,7 +19,7 @@ export default function FavoritesItem({ star, removeFavorite }: FavoritesItemPro
 
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const wikiData = useWikipediaSummary(star);
+  const wikiData = useWikipediaSummary(star, isModalOpen);
 
   const displayName = star.name && star.name.trim() !== "" ? star.name : "Unnamed Star";
 

@@ -12,6 +12,11 @@
 - Never hardcode Cloudinary cloud name, upload preset, Supabase URL, or Supabase keys
 - All external service config belongs in `.env` as `VITE_*` variables
 
+## Backend ESM Imports (strawberry-star-server)
+- `jsonwebtoken` is CJS-only — NEVER use `import { sign } from "jsonwebtoken"` or `import { verify } from "jsonwebtoken"`
+- Correct pattern: `import jwt from "jsonwebtoken"; const { sign } = jwt;` (matches NodeNext CJS interop)
+- Same rule applies to any other CJS package that lacks named ESM exports
+
 ## Git
 - Never commit automatically — always recommend the git command + Conventional Commits message for the user
 - Never amend published commits

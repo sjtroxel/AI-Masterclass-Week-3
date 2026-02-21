@@ -1,4 +1,5 @@
-import { verify } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+const { verify } = jwt;
 import type { Request, Response, NextFunction } from "express";
 import type { AuthUser, JwtPayload } from "../types/auth.js";
 

@@ -25,22 +25,27 @@ const mockStar: Star = {
 };
 
 describe("useWikipediaSummary", () => {
-  it("loads wikipedia summary successfully", async () => {
+  it("does not fetch when enabled is false", () => {
+    const { result } = renderHook(() => useWikipediaSummary(mockStar, false));
+
+    expect(mockFetch).not.toHaveBeenCalled();
+    expect(result.current.loading).toBe(false);
+    expect(result.current.data).toBeNull();
+  });
+
+  it("loads wikipedia summary successfully when enabled", async () => {
     mockFetch.mockResolvedValue({
       title: "Sirius",
       pageid: 123,
       extract: "Sirius is a star...",
     });
 
-    const { result } = renderHook(() =>
-      useWikipediaSummary(mockStar)
-    );
+    const { result } = renderHook(() => useWikipediaSummary(mockStar, true));
 
-    // immediately after render
+    // loading starts synchronously once the effect fires
     expect(result.current.loading).toBe(true);
     expect(result.current.error).toBe(false);
 
-    // wait for async effect to finish
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
     });
@@ -52,9 +57,7 @@ describe("useWikipediaSummary", () => {
   it("sets error when wikipedia fetch fails", async () => {
     mockFetch.mockRejectedValue(new Error("No article"));
 
-    const { result } = renderHook(() =>
-      useWikipediaSummary(mockStar)
-    );
+    const { result } = renderHook(() => useWikipediaSummary(mockStar, true));
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
