@@ -209,7 +209,7 @@ export default function Navbar() {
                     animate-[menuPulse_4s_ease-in-out_infinite]
                   "
                 >
-                  🌌 Galactic Map <span className="text-xs italic opacity-70">(coming soon)</span>
+                  🌌 Galactic Map
                 </Link>
 
                 <button
@@ -284,7 +284,7 @@ export default function Navbar() {
                     animate-[menuPulse_4s_ease-in-out_infinite]
                   "
                 >
-                  🌌 Galactic Map <span className="text-xs italic opacity-70">(coming soon)</span>
+                  🌌 Galactic Map
                 </Link>
 
                 <button

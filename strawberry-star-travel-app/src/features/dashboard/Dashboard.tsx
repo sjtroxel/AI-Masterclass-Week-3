@@ -82,11 +82,10 @@ export default function Dashboard() {
             </Link>
           ))}
 
-          {/* 🔥 Galactic Map — Coming Soon */}
           <Link to="/galactic-map">
             <div
               className="
-                bg-black/30 backdrop-blur-xl border border-orange-500/40 
+                bg-black/30 backdrop-blur-xl border border-orange-500/40
                 rounded-xl p-6 shadow-xl opacity-80 cursor-pointer transition
                 hover:opacity-100 hover:-translate-y-2 hover:border-orange-400/70
                 hover:shadow-[0_0_20px_rgba(255,140,50,0.6)]
@@ -94,9 +93,8 @@ export default function Dashboard() {
             >
               <h2 className="text-xl font-semibold mb-2 text-orange-300">🌌 Galactic Map</h2>
               <p className="text-sm text-gray-200 pt-1 leading-relaxed">
-                Soon you'll navigate your favorite stars on an interactive galactic map.
+                Navigate your favorite stars on an interactive 3D galactic map.
               </p>
-              <p className="mt-3 text-xs font-bold pt-1 italic text-orange-400">Coming soon! 🔥</p>
             </div>
           </Link>
         </div>

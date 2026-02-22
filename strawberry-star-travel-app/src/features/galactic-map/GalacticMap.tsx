@@ -1,8 +1,8 @@
 import React from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, Stars, PerspectiveCamera } from "@react-three/drei";
+import { OrbitControls, Stars, PerspectiveCamera, Line } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import { Vector3 } from "three";
+import { Vector3, MeshStandardMaterial } from "three";
 import { useFavorites } from "../../hooks/useFavorites";
 import { loadStarsByIds } from "../../lib/starCatalog";
 import type { StarCatalogEntry } from "../../lib/starCatalog";
@@ -13,6 +13,8 @@ import PingFoot from "../../styles/PingFoot.png";
 
 // Scale: 1 light year → 0.05 scene units (20 ly ≈ 1 grid square)
 const LY_TO_SCENE = 0.05;
+
+const WARP_9_SPEED = 1516; // 1,516× light speed (TNG scale)
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -89,6 +91,49 @@ function centerRect(): DOMRect {
   );
 }
 
+// 3D Euclidean distance between two points in light-year space.
+// Used for segment-to-segment calculations — not the HYG distanceLy field.
+function euclideanLy(
+  a: [number, number, number],
+  b: [number, number, number]
+): number {
+  const dx = b[0] - a[0];
+  const dy = b[1] - a[1];
+  const dz = b[2] - a[2];
+  return Math.sqrt(dx * dx + dy * dy + dz * dz);
+}
+
+// Sum of all segment distances in the path chain, starting from the Sun.
+const SUN_COORDS: [number, number, number] = [0, 0, 0];
+
+function totalPathDistance(path: SelectedStar[]): number {
+  if (path.length === 0) return 0;
+  let total = 0;
+  let prev: [number, number, number] = SUN_COORDS;
+  for (const star of path) {
+    total += euclideanLy(prev, star.coords);
+    prev = star.coords;
+  }
+  return total;
+}
+
+// Travel time helpers (spec-defined thresholds, extended with sub-month resolution)
+function formatYears(years: number): string {
+  if (years < 1 / 365.25) return `${Math.round(years * 365.25 * 24)} hrs`;
+  if (years < 1 / 12) return `${Math.round(years * 365.25)} days`;
+  if (years < 1) return `${(years * 12).toFixed(1)} months`;
+  if (years < 100) return `${years.toFixed(2)} years`;
+  return `${years.toFixed(0)} years`;
+}
+
+function warp1Time(distanceLy: number): string {
+  return formatYears(distanceLy);
+}
+
+function warp9Time(distanceLy: number): string {
+  return formatYears(distanceLy / WARP_9_SPEED);
+}
+
 // ── WarpDrive ─────────────────────────────────────────────────────────────────
 // Lives inside Canvas so it can use useFrame / useThree.
 // Smoothly lerps the camera and OrbitControls target toward the selected star.
@@ -96,21 +141,37 @@ function centerRect(): DOMRect {
 
 type WarpDriveProps = {
   target: [number, number, number] | null;
-  controlsRef: React.RefObject<OrbitControlsImpl>;
+  controlsRef: React.RefObject<OrbitControlsImpl | null>;
 };
 
 function WarpDrive({ target, controlsRef }: WarpDriveProps) {
-  const { camera } = useThree();
+  const { camera, gl } = useThree();
 
   // Persistent Vector3 instances — avoids allocations inside useFrame
   const starVec = React.useRef(new Vector3());
   const camVec = React.useRef(new Vector3());
 
-  // Becomes true once camera has arrived; reset whenever target changes
+  // Becomes true once camera has arrived or the user grabs the controls.
+  // Reset to false whenever a new warp target is received.
   const done = React.useRef(false);
   React.useEffect(() => {
     done.current = false;
   }, [target]);
+
+  // Manual override: any wheel or pointer-down event on the canvas
+  // immediately hands control back to OrbitControls.
+  React.useEffect(() => {
+    const canvas = gl.domElement;
+    const override = () => {
+      done.current = true;
+    };
+    canvas.addEventListener("wheel", override, { passive: true });
+    canvas.addEventListener("pointerdown", override);
+    return () => {
+      canvas.removeEventListener("wheel", override);
+      canvas.removeEventListener("pointerdown", override);
+    };
+  }, [gl.domElement]);
 
   useFrame(() => {
     if (!target || !controlsRef.current || done.current) return;
@@ -124,13 +185,39 @@ function WarpDrive({ target, controlsRef }: WarpDriveProps) {
     controlsRef.current.target.lerp(starVec.current, 0.04);
     controlsRef.current.update();
 
-    // Hand control back to OrbitControls once we've arrived
-    if (camera.position.distanceTo(camVec.current) < 0.05) {
+    // Wider arrival radius (0.1) avoids jitter when OrbitControls and the
+    // lerp converge on the same target from opposite sides.
+    if (camera.position.distanceTo(camVec.current) < 0.1) {
       done.current = true;
     }
   });
 
   return null;
+}
+
+// ── CourseLine ────────────────────────────────────────────────────────────────
+// Renders a continuous dashed cyan polyline from the Sun through every waypoint.
+// Lives inside Canvas so it has access to R3F context.
+
+type CourseLineProps = {
+  path: SelectedStar[];
+};
+
+function CourseLine({ path }: CourseLineProps) {
+  if (path.length === 0) return null;
+  const points: [number, number, number][] = [
+    [0, 0, 0],
+    ...path.map((s) => toScenePos(s.coords)),
+  ];
+  return (
+    <Line
+      points={points}
+      color="#00ffff"
+      lineWidth={1.5}
+      dashed
+      dashScale={2}
+    />
+  );
 }
 
 // ── StarMesh ──────────────────────────────────────────────────────────────────
@@ -140,9 +227,17 @@ type StarMeshProps = {
   color: string;
   isSelected: boolean;
   onClick: () => void;
+  pulse?: boolean;
 };
 
-function StarMesh({ position, color, isSelected, onClick }: StarMeshProps) {
+function StarMesh({ position, color, isSelected, onClick, pulse }: StarMeshProps) {
+  const matRef = React.useRef<MeshStandardMaterial>(null);
+
+  useFrame(() => {
+    if (!pulse || isSelected || !matRef.current) return;
+    matRef.current.emissiveIntensity = 0.15 + Math.sin(Date.now() * 0.002) * 0.15;
+  });
+
   return (
     <mesh
       position={position}
@@ -160,9 +255,10 @@ function StarMesh({ position, color, isSelected, onClick }: StarMeshProps) {
     >
       <sphereGeometry args={[0.2, 16, 16]} />
       <meshStandardMaterial
+        ref={matRef}
         color={isSelected ? "#00ffff" : color}
-        emissive={isSelected ? "#00ffff" : "#000000"}
-        emissiveIntensity={isSelected ? 0.8 : 0}
+        emissive={isSelected ? "#00ffff" : pulse ? "#ffff00" : "#000000"}
+        emissiveIntensity={isSelected ? 0.8 : pulse ? 0.15 : 0}
       />
     </mesh>
   );
@@ -174,9 +270,21 @@ type FootReadoutProps = {
   selected: SelectedStar | null;
   isLoading: boolean;
   onRemove: () => void;
+  coursePath: SelectedStar[];
+  onAddToCourse: () => void;
+  onUndoLast: () => void;
+  onClearPath: () => void;
 };
 
-function FootReadout({ selected, isLoading, onRemove }: FootReadoutProps) {
+function FootReadout({
+  selected,
+  isLoading,
+  onRemove,
+  coursePath,
+  onAddToCourse,
+  onUndoLast,
+  onClearPath,
+}: FootReadoutProps) {
   if (isLoading) {
     return (
       <span className="text-yellow-400 animate-pulse">
@@ -185,38 +293,83 @@ function FootReadout({ selected, isLoading, onRemove }: FootReadoutProps) {
     );
   }
 
-  if (!selected) {
+  const hasPath = coursePath.length > 0;
+  const totalDist = totalPathDistance(coursePath);
+
+  if (!selected && !hasPath) {
     return (
       <span className="text-green-400">Standing by for navigation data.</span>
     );
   }
 
-  const [x, y, z] = selected.coords;
-  const isSun = selected.name === "Sun";
-  const isCatalogStar = selected.id !== undefined;
+  const isSun = selected?.name === "Sun";
+  const isCatalogStar = selected?.id !== undefined;
 
   // Sun is permanent — no remove/hide button
   // Starter stars (no id) → "Hide from View"  (session-only, resets on refresh)
   // Catalog favorites (has id) → "Remove from Charts"  (permanent, hits the DB)
-  const buttonLabel = isCatalogStar ? "Remove from Charts" : "Hide from View";
+  const removeLabel = isCatalogStar ? "Remove from Charts" : "Hide from View";
 
   return (
     <>
-      <span className="text-cyan-400">
-        Target Lock: {selected.name}.<br />
-        Distance: {selected.distanceLy.toFixed(2)} ly.<br />
-        Coordinates: {x.toFixed(2)}, {y.toFixed(2)}, {z.toFixed(2)} ly.
-      </span>
-      {!isSun && (
-        <div className="mt-2 flex justify-end">
+      {/* Target Lock section */}
+      {selected ? (
+        <span className="text-cyan-400">
+          Target Lock: {selected.name}.<br />
+          Distance: {selected.distanceLy.toFixed(2)} ly.<br />
+          Coordinates: {selected.coords[0].toFixed(2)}, {selected.coords[1].toFixed(2)},{" "}
+          {selected.coords[2].toFixed(2)} ly.
+        </span>
+      ) : (
+        <span className="text-green-400">Standing by for navigation data.</span>
+      )}
+
+      {/* Path chain section — visible whenever coursePath is non-empty */}
+      {hasPath && (
+        <div className="mt-1 text-cyan-300 text-xs leading-relaxed">
+          Path: Sun → {coursePath.map((s) => s.name).join(" → ")}
+          <br />
+          Total: {totalDist.toFixed(2)} ly
+          <br />
+          Warp 1: {warp1Time(totalDist)}&nbsp;&nbsp;|&nbsp;&nbsp;Warp 9: {warp9Time(totalDist)}
+        </div>
+      )}
+
+      {/* Action buttons */}
+      <div className="mt-2 flex justify-end gap-2 flex-wrap">
+        {selected && (
+          <button
+            onClick={onAddToCourse}
+            className="px-2 py-1 text-xs font-mono rounded border border-cyan-600 text-cyan-500 hover:bg-cyan-500/20 transition-colors"
+          >
+            Add to Course
+          </button>
+        )}
+        {hasPath && (
+          <>
+            <button
+              onClick={onUndoLast}
+              className="px-2 py-1 text-xs font-mono rounded border border-yellow-600 text-yellow-500 hover:bg-yellow-500/20 transition-colors"
+            >
+              Undo Last
+            </button>
+            <button
+              onClick={onClearPath}
+              className="px-2 py-1 text-xs font-mono rounded border border-orange-600 text-orange-500 hover:bg-orange-500/20 transition-colors"
+            >
+              Clear All
+            </button>
+          </>
+        )}
+        {selected && !isSun && (
           <button
             onClick={onRemove}
             className="px-2 py-1 text-xs font-mono rounded border border-red-500 text-red-400 hover:bg-red-500/20 transition-colors"
           >
-            {buttonLabel}
+            {removeLabel}
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </>
   );
 }
@@ -230,6 +383,8 @@ export default function GalacticMap() {
   const [selectedStar, setSelectedStar] = React.useState<SelectedStar | null>(null);
   const [showModal, setShowModal] = React.useState(false);
   const [hiddenStarters, setHiddenStarters] = React.useState<string[]>([]);
+  // Multi-stop course path: ordered array of waypoints originating from the Sun.
+  const [coursePath, setCoursePath] = React.useState<SelectedStar[]>([]);
 
   // Ref for OrbitControls — shared with WarpDrive for target animation
   const controlsRef = React.useRef<OrbitControlsImpl>(null);
@@ -275,6 +430,20 @@ export default function GalacticMap() {
 
   const handleRemoveCancel = () => setShowModal(false);
 
+  // Course path handlers
+  const handleAddToCourse = () => {
+    if (!selectedStar) return;
+    setCoursePath((prev) => [...prev, selectedStar]);
+  };
+
+  const handleUndoLast = () => {
+    setCoursePath((prev) => prev.slice(0, -1));
+  };
+
+  const handleClearPath = () => {
+    setCoursePath([]);
+  };
+
   // Minimal Star-compatible object for the modal — it only reads star.name.
   const modalStar: Star | null =
     selectedStar?.id !== undefined
@@ -311,6 +480,9 @@ export default function GalacticMap() {
         {/* Fly-to animation — lives inside Canvas to access useFrame */}
         <WarpDrive target={warpTarget} controlsRef={controlsRef} />
 
+        {/* Multi-stop course polyline — from Sun through all waypoints */}
+        <CourseLine path={coursePath} />
+
         {/* Habitable starter stars — hidden ones excluded */}
         {HABITABLE_STARTER_STARS.filter((s) => !hiddenStarters.includes(s.name)).map((star) => (
           <StarMesh
@@ -318,6 +490,7 @@ export default function GalacticMap() {
             position={toScenePos(star.coords)}
             color={star.color}
             isSelected={selectedStar?.name === star.name && selectedStar.id === undefined}
+            pulse={star.name === "Sun" && coursePath.length > 0}
             onClick={() =>
               setSelectedStar({
                 name: star.name,
@@ -365,6 +538,10 @@ export default function GalacticMap() {
               selected={selectedStar}
               isLoading={isLoading}
               onRemove={handleRemoveClick}
+              coursePath={coursePath}
+              onAddToCourse={handleAddToCourse}
+              onUndoLast={handleUndoLast}
+              onClearPath={handleClearPath}
             />
           </div>
 
