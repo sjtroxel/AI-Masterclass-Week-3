@@ -22,7 +22,7 @@ export default function Signup() {
   const [message, setMessage] = React.useState("");
   const [loading, setLoading] = React.useState(false);
 
-  const [countdown, setCountdown] = React.useState(15);
+  const [countdown, setCountdown] = React.useState(5);
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
@@ -57,7 +57,7 @@ export default function Signup() {
       await register(email, password, username);
       setMessage(`Signup successful, ${username}!`);
       setSignupSuccess(true);
-      setCountdown(15);
+      setCountdown(5);
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Signup failed");
     } finally {
@@ -79,10 +79,10 @@ export default function Signup() {
       });
     }, 1000);
 
-    // Redirect at 15 seconds
+    // Redirect at 5 seconds
     const redirectTimer = setTimeout(() => {
       navigate("/dashboard");
-    }, 15000);
+    }, 5000);
 
     return () => {
       clearInterval(interval);

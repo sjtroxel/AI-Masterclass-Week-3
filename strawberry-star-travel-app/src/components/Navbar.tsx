@@ -130,21 +130,95 @@ export default function Navbar() {
             "
               />
 
-              {/* Hamburger icon */}
-              <button
-                onClick={() => setMenuOpen(!menuOpen)}
-                aria-label="Menu"
-                className="
-              text-pink-300 text-2xl sm:text-xl transition-transform duration-300
-              drop-shadow-[0_0_8px_rgba(255,150,255,0.6)]
-              hover:scale-110 active:scale-110
-            "
-                style={{
-                  transform: menuOpen ? "rotate(90deg)" : "rotate(0deg)",
-                }}
-              >
-                {menuOpen ? "✕" : "☰"}
-              </button>
+              {/* Hamburger + desktop dropdown wrapper */}
+              <div className="relative">
+                {/* Fixed-size button so the box never shifts between ☰ and ✕ */}
+                <button
+                  onClick={() => setMenuOpen(!menuOpen)}
+                  aria-label="Menu"
+                  className="
+                w-8 h-8 flex items-center justify-center
+                text-pink-300 text-2xl sm:text-xl
+                drop-shadow-[0_0_8px_rgba(255,150,255,0.6)]
+                hover:scale-110 active:scale-110 transition-transform duration-200
+              "
+                >
+                  {menuOpen ? "✕" : "☰"}
+                </button>
+
+                {/* Desktop dropdown — anchored directly under the button */}
+                {menuOpen && (
+                  <div
+                    className="
+                  hidden sm:block absolute right-0 top-full mt-2 w-64 bg-gray-900
+                  border border-pink-400 rounded-xl shadow-xl animate-fadeIn
+                  overflow-hidden z-50
+                "
+                  >
+                    <nav className="flex flex-col font-semibold text-sm divide-y divide-gray-800">
+                      {!user && (
+                        <>
+                          <Link
+                            to="/login"
+                            onClick={() => setMenuOpen(false)}
+                            className="px-4 py-3 hover:bg-gray-800"
+                          >
+                            Log In
+                          </Link>
+                          <Link
+                            to="/signup"
+                            onClick={() => setMenuOpen(false)}
+                            className="px-4 py-3 hover:bg-gray-800"
+                          >
+                            Sign Up
+                          </Link>
+                        </>
+                      )}
+
+                      {user && (
+                        <>
+                          {[
+                            ["🛰️  Dashboard", "/dashboard"],
+                            ["🌟  Browse Stars", "/browse-stars"],
+                            ["💖  Favorites", "/favorites"],
+                            ["📡  Profile", "/profile"],
+                          ].map(([label, path]) => (
+                            <Link
+                              key={path}
+                              to={path}
+                              onClick={() => setMenuOpen(false)}
+                              className="
+                                px-4 py-3 transition-colors hover:bg-pink-900/30
+                                hover:text-pink-300 font-semibold animate-[menuPulse_4s_ease-in-out_infinite]
+                              "
+                            >
+                              {label}
+                            </Link>
+                          ))}
+
+                          <Link
+                            to="/galactic-map"
+                            onClick={() => setMenuOpen(false)}
+                            className="
+                              px-4 font-semibold py-3 hover:bg-pink-900/30 text-pink-300
+                              animate-[menuPulse_4s_ease-in-out_infinite]
+                            "
+                          >
+                            🌌 Galactic Map
+                          </Link>
+
+                          <button
+                            onClick={handleLogout}
+                            className="px-4 py-3 font-semibold text-left text-red-400 hover:bg-red-900/20"
+                          >
+                            Log Out
+                          </button>
+                        </>
+                      )}
+                    </nav>
+                  </div>
+                )}
+              </div>
             </>
           )}
         </div>
@@ -226,78 +300,6 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* Desktop Menu — Cosmic Panel */}
-      {menuOpen && (
-        <div
-          className="
-          hidden sm:block absolute right-6 mt-2 w-64 bg-gray-900
-          border border-pink-400 rounded-xl shadow-xl animate-fadeIn
-          overflow-hidden
-        "
-        >
-          <nav className="flex flex-col font-semibold text-sm divide-y divide-gray-800">
-            {!user && (
-              <>
-                <Link
-                  to="/login"
-                  onClick={() => setMenuOpen(false)}
-                  className="px-4 py-3 hover:bg-gray-800"
-                >
-                  Log In
-                </Link>
-                <Link
-                  to="/signup"
-                  onClick={() => setMenuOpen(false)}
-                  className="px-4 py-3 hover:bg-gray-800"
-                >
-                  Sign Up
-                </Link>
-              </>
-            )}
-
-            {user && (
-              <>
-                {[
-                  ["🛰️  Dashboard", "/dashboard"],
-                  ["🌟  Browse Stars", "/browse-stars"],
-                  ["💖  Favorites", "/favorites"],
-                  ["📡  Profile", "/profile"],
-                ].map(([label, path]) => (
-                  <Link
-                    key={path}
-                    to={path}
-                    onClick={() => setMenuOpen(false)}
-                    className="
-                      px-4 py-3 transition-colors hover:bg-pink-900/30
-                      hover:text-pink-300 font-semibold animate-[menuPulse_4s_ease-in-out_infinite]
-                    "
-                  >
-                    {label}
-                  </Link>
-                ))}
-
-                <Link
-                  to="/galactic-map"
-                  onClick={() => setMenuOpen(false)}
-                  className="
-                    px-4 font-semibold py-3 hover:bg-pink-900/30 text-pink-300
-                    animate-[menuPulse_4s_ease-in-out_infinite]
-                  "
-                >
-                  🌌 Galactic Map
-                </Link>
-
-                <button
-                  onClick={handleLogout}
-                  className="px-4 py-3 font-semibold text-left text-red-400 hover:bg-red-900/20"
-                >
-                  Log Out
-                </button>
-              </>
-            )}
-          </nav>
-        </div>
-      )}
     </nav>
   );
 }

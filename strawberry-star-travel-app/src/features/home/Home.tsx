@@ -1,12 +1,15 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import Starfield from "../../components/Starfield";
 import ShootingStars from "../../components/ShootingStars";
 import Strawberry from "../../styles/Strawberry.png";
 // import { Star_Facts } from "../stars/data/starFacts";
 // import { homeFeatures } from "./data/homeFeatures";
 import HomeCarousel from "./components/HomeCarousel";
+import { useUser } from "../../hooks/useUser";
 
 export default function Home() {
+  const { user } = useUser();
   {
     /* "Locked" Feature Teaser Modal */
   }
@@ -135,30 +138,46 @@ export default function Home() {
 
           {/* Primary CTA */}
           <div className="mt-5 flex flex-col items-center gap-5">
-            <a
-              href="/signup"
-              className="
-              px-6 py-2 rounded-full font-bold text-sm sm:text-base
-              bg-linear-to-r from-pink-700 via-rose-700 to-fuchsia-700
-              text-zinc-300 shadow-[0_0_20px_rgba(255,120,200,0.6)]
-              hover:scale-105 active:scale-100 transition-transform
-            "
-            >
-              Begin Your Journey
-            </a>
-            <div className="flex justify-center mb-8">
-              <p
+            {user ? (
+              <Link
+                to="/browse-stars"
                 className="
-                inline-block text-xs font-semibold italic text-slate-100
-                px-4 py-1.5 rounded-full
-                bg-black/30 border border-sky-400/30
-                backdrop-blur-sm
-                shadow-[0_0_12px_rgba(100,200,255,0.15)]
+                px-6 py-2 rounded-full font-bold text-sm sm:text-base
+                bg-linear-to-r from-pink-700 via-rose-700 to-fuchsia-700
+                text-zinc-300 shadow-[0_0_20px_rgba(255,120,200,0.6)]
+                hover:scale-105 active:scale-100 transition-transform
               "
               >
-                Sign up for free to explore stars and unlock features!
-              </p>
-            </div>
+                Explore the Stars
+              </Link>
+            ) : (
+              <>
+                <a
+                  href="/signup"
+                  className="
+                  px-6 py-2 rounded-full font-bold text-sm sm:text-base
+                  bg-linear-to-r from-pink-700 via-rose-700 to-fuchsia-700
+                  text-zinc-300 shadow-[0_0_20px_rgba(255,120,200,0.6)]
+                  hover:scale-105 active:scale-100 transition-transform
+                "
+                >
+                  Begin Your Journey
+                </a>
+                <div className="flex justify-center mb-8">
+                  <p
+                    className="
+                    inline-block text-xs font-semibold italic text-slate-100
+                    px-4 py-1.5 rounded-full
+                    bg-black/30 border border-sky-400/30
+                    backdrop-blur-sm
+                    shadow-[0_0_12px_rgba(100,200,255,0.15)]
+                  "
+                  >
+                    Sign up for free to explore stars and unlock features!
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -175,19 +194,21 @@ export default function Home() {
       {/* Features */}
       <section className="relative w-full py-28 z-10">
         {/* 2a — one-line explanation ABOVE the grid */}
-        <div className="flex justify-center mb-6">
-          <p
-            className="
-            inline-block text-xs font-semibold italic text-sky-100
-            px-4 py-1.5 rounded-full
-            bg-black/30 border border-sky-400/30
-            backdrop-blur-sm
-            shadow-[0_0_12px_rgba(100,200,255,0.15)]
-          "
-          >
-            Unlock the below features by creating a free account!
-          </p>
-        </div>
+        {!user && (
+          <div className="flex justify-center mb-6">
+            <p
+              className="
+              inline-block text-xs font-semibold italic text-sky-100
+              px-4 py-1.5 rounded-full
+              bg-black/30 border border-sky-400/30
+              backdrop-blur-sm
+              shadow-[0_0_12px_rgba(100,200,255,0.15)]
+            "
+            >
+              Unlock the below features by creating a free account!
+            </p>
+          </div>
+        )}
 
         <div className="mt-8 flex justify-center">
           <HomeCarousel onFeatureClick={(title) => setLockedFeature(title)} />
@@ -196,19 +217,35 @@ export default function Home() {
 
       {/* Post-features CTA */}
       <div className="relative z-10 py-20 flex flex-col items-center gap-4">
-        <p className="text-lg font-semibold text-gray-200">Ready to explore for real?</p>
+        <p className="text-lg font-semibold text-gray-200">
+          {user ? "Where to next?" : "Ready to explore for real?"}
+        </p>
 
-        <a
-          href="/signup"
-          className="px-6 py-2 rounded-full font-bold text-sm sm:text-base
-            bg-linear-to-r from-blue-800 to-cyan-700
-            text-white
-            shadow-[0_0_24px_rgba(255,120,200,0.6)]
-            hover:scale-105 transition-transform
-          "
-        >
-          Create Free Account
-        </a>
+        {user ? (
+          <Link
+            to="/browse-stars"
+            className="px-6 py-2 rounded-full font-bold text-sm sm:text-base
+              bg-linear-to-r from-blue-800 to-cyan-700
+              text-white
+              shadow-[0_0_24px_rgba(255,120,200,0.6)]
+              hover:scale-105 transition-transform
+            "
+          >
+            Browse the Catalog
+          </Link>
+        ) : (
+          <a
+            href="/signup"
+            className="px-6 py-2 rounded-full font-bold text-sm sm:text-base
+              bg-linear-to-r from-blue-800 to-cyan-700
+              text-white
+              shadow-[0_0_24px_rgba(255,120,200,0.6)]
+              hover:scale-105 transition-transform
+            "
+          >
+            Create Free Account
+          </a>
+        )}
       </div>
 
       {/* Footer */}

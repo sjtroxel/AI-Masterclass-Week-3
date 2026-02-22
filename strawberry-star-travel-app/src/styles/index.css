@@ -112,3 +112,32 @@ button:focus-visible {
 footer {
   text-shadow: 0 0 12px rgba(255, 150, 200, 0.15);
 }
+
+/* =========================
+   Scrollbar Styling
+   Webkit: Chrome, Edge, Safari
+   Firefox: scrollbar-width / scrollbar-color
+========================= */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(244, 114, 182, 0.35); /* pink-400 at low opacity */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(244, 114, 182, 0.65);
+}
+
+/* Firefox */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(244, 114, 182, 0.35) transparent;
+}
