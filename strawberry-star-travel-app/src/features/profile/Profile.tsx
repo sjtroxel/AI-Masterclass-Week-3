@@ -4,7 +4,7 @@ import Starfield from "../../components/Starfield";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function Profile() {
-  const { user } = useUser();
+  const { user, isDemoMode } = useUser();
   // user_metadata fields deferred to Phase 4 — backend profile endpoint not yet implemented
   const [username, setUsername] = React.useState(user?.username || "");
   const [firstName, setFirstName] = React.useState("");
@@ -99,10 +99,16 @@ export default function Profile() {
 
         <button
           onClick={handleUpdateProfile}
-          className="w-full py-1.5 rounded-lg bg-red-800 hover:bg-red-950 active:scale-[.98] transition tracking-wide shadow-lg shadow-red-600/30"
+          disabled={isDemoMode}
+          className={`w-full py-1.5 rounded-lg bg-red-800 hover:bg-red-950 active:scale-[.98] transition tracking-wide shadow-lg shadow-red-600/30 ${isDemoMode ? "opacity-50 cursor-not-allowed" : ""}`}
         >
           Save Profile Changes
         </button>
+        {isDemoMode && (
+          <p className="mt-2 text-xs text-yellow-300 italic text-center">
+            Sign up for a free account to save your profile.
+          </p>
+        )}
 
         {/* Password Change Section */}
         <h3 className="text-lg font-semibold mt-6 mb-2 pt-4 pb-2 text-center">Change Password</h3>
@@ -159,7 +165,8 @@ export default function Profile() {
 
         <button
           onClick={handleChangePassword}
-          className="w-full py-1.5 rounded-lg bg-red-800 hover:bg-red-950 active:scale-[.98] transition tracking-wide shadow-lg shadow-red-600/30"
+          disabled={isDemoMode}
+          className={`w-full py-1.5 rounded-lg bg-red-800 hover:bg-red-950 active:scale-[.98] transition tracking-wide shadow-lg shadow-red-600/30 ${isDemoMode ? "opacity-50 cursor-not-allowed" : ""}`}
         >
           Change Password
         </button>

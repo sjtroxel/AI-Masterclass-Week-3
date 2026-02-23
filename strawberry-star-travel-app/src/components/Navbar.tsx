@@ -7,7 +7,7 @@ import Strawberry from "../styles/Strawberry.png";
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user, isDemoMode } = useUser();
   const { logout } = useAuth();
   const username = user?.username;
   const avatar: string | undefined = undefined; // avatar deferred to Phase 4
@@ -66,8 +66,13 @@ export default function Navbar() {
             "
             ></div>
 
-            <span className="text-pink-300 text-sm font-semibold drop-shadow-[0_0_4px_rgba(255,100,255,0.5)]">
+            <span className="text-pink-300 text-sm font-semibold drop-shadow-[0_0_4px_rgba(255,100,255,0.5)] flex items-center gap-2">
               Hello, {username || "traveler"}!
+              {isDemoMode && (
+                <span className="px-1.5 py-0.5 text-xs font-bold bg-yellow-500/20 border border-yellow-400/50 text-yellow-300 rounded">
+                  DEMO
+                </span>
+              )}
             </span>
 
             {/* Avatar — only desktop spins */}
@@ -211,7 +216,7 @@ export default function Navbar() {
                             onClick={handleLogout}
                             className="px-4 py-3 font-semibold text-left text-red-400 hover:bg-red-900/20"
                           >
-                            Log Out
+                            {isDemoMode ? "Exit Demo" : "Log Out"}
                           </button>
                         </>
                       )}
@@ -292,7 +297,7 @@ export default function Navbar() {
                     px-4 py-3 font-semibold text-left text-red-400 hover:bg-red-900/20
                   "
                 >
-                  Log Out
+                  {isDemoMode ? "Exit Demo" : "Log Out"}
                 </button>
               </>
             )}

@@ -3,6 +3,7 @@ import type { Star } from "../features/stars/Star";
 import { useAuth } from "../app/context/AuthContext";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+const DEMO_FAVORITES_KEY = "demoFavorites";
 
 interface FavoritesResponse {
   starIds: number[];
@@ -14,13 +15,25 @@ interface ToggleResponse {
 }
 
 export function useFavorites() {
-  const { user, token } = useAuth();
+  const { user, token, isDemoMode } = useAuth();
 
   const [favorites, setFavorites] = React.useState<number[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
 
-  // Load favorites from backend on mount / when token changes
+  // Load favorites on mount / when auth state changes
   React.useEffect(() => {
+    if (isDemoMode) {
+      // Demo mode: load from localStorage
+      try {
+        const stored = localStorage.getItem(DEMO_FAVORITES_KEY);
+        setFavorites(stored ? (JSON.parse(stored) as number[]) : []);
+      } catch {
+        setFavorites([]);
+      }
+      setLoading(false);
+      return;
+    }
+
     if (!token) {
       setFavorites([]);
       setLoading(false);
@@ -57,9 +70,20 @@ export function useFavorites() {
     return () => {
       cancelled = true;
     };
-  }, [token]);
+  }, [token, isDemoMode]);
 
   const addFavorite = async (star: Star) => {
+    if (isDemoMode) {
+      // Demo mode: persist to localStorage
+      setFavorites((prev) => {
+        if (prev.includes(star.id)) return prev;
+        const next = [...prev, star.id];
+        localStorage.setItem(DEMO_FAVORITES_KEY, JSON.stringify(next));
+        return next;
+      });
+      return;
+    }
+
     if (!user || !token) {
       console.warn("Not logged in: cannot add favorite");
       return;
@@ -90,6 +114,16 @@ export function useFavorites() {
   };
 
   const removeFavorite = async (starId: number) => {
+    if (isDemoMode) {
+      // Demo mode: remove from localStorage
+      setFavorites((prev) => {
+        const next = prev.filter((id) => id !== starId);
+        localStorage.setItem(DEMO_FAVORITES_KEY, JSON.stringify(next));
+        return next;
+      });
+      return;
+    }
+
     if (!user || !token) {
       console.warn("Not logged in: cannot remove favorite");
       return;

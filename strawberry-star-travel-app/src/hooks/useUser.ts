@@ -6,5 +6,5 @@ export function useUser() {
   if (!ctx) {
     throw new Error("useUser must be used inside <AuthProvider>");
   }
-  return { user: ctx.user, loading: ctx.loading };
+  return { user: ctx.user, loading: ctx.loading, isDemoMode: ctx.isDemoMode };
 }

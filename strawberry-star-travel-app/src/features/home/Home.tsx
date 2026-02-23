@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Starfield from "../../components/Starfield";
 import ShootingStars from "../../components/ShootingStars";
 import Strawberry from "../../styles/Strawberry.png";
@@ -7,9 +7,17 @@ import Strawberry from "../../styles/Strawberry.png";
 // import { homeFeatures } from "./data/homeFeatures";
 import HomeCarousel from "./components/HomeCarousel";
 import { useUser } from "../../hooks/useUser";
+import { useAuth } from "../../app/context/AuthContext";
 
 export default function Home() {
   const { user } = useUser();
+  const { startDemo } = useAuth();
+  const navigate = useNavigate();
+
+  function handleStartDemo() {
+    startDemo();
+    navigate("/dashboard");
+  }
   {
     /* "Locked" Feature Teaser Modal */
   }
@@ -163,6 +171,18 @@ export default function Home() {
                 >
                   Begin Your Journey
                 </a>
+                <button
+                  onClick={handleStartDemo}
+                  className="
+                  px-6 py-2 rounded-full font-bold text-sm sm:text-base
+                  border border-yellow-400/50 text-yellow-300
+                  bg-yellow-500/10 hover:bg-yellow-500/20
+                  shadow-[0_0_12px_rgba(234,179,8,0.2)]
+                  hover:scale-105 active:scale-100 transition-transform
+                "
+                >
+                  Try Demo Mode
+                </button>
                 <div className="flex justify-center mb-8">
                   <p
                     className="
