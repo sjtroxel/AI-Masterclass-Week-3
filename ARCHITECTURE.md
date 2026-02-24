@@ -11,21 +11,22 @@
 │  │ strawberry-star-      │   │ strawberry-star-       │  │
 │  │ travel-app/           │   │ server/                │  │
 │  │ (React Frontend)      │   │ (Node.js/Express)      │  │
-│  │                       │   │ *** NOT YET BUILT ***  │  │
+│  │                       │   │ *** ACTIVE — Phase 2 **│  │
 │  │  Vite 7 + React 19   │   │                        │  │
-│  │  TypeScript 5.9       │   │  Will handle:          │  │
-│  │  Tailwind CSS 4       │   │  - Auth                │  │
-│  │                       │   │  - Data API            │  │
-│  └───────┬───────────────┘   │  - Business logic      │  │
-│          │                   └────────────────────────┘  │
-│          │                                               │
-└──────────┼───────────────────────────────────────────────┘
-           │
-           ▼
+│  │  TypeScript 5.9       │   │  Handles:              │  │
+│  │  Tailwind CSS 4       │   │  - Auth (JWT)          │  │
+│  └───────┬───────────────┘   │  - Favorites API       │  │
+│          │                   │  - Business logic      │  │
+│          │                   └──────────┬─────────────┘  │
+│          │                              │               │
+└──────────┼──────────────────────────────┼───────────────┘
+           │                              │
+           ▼                              ▼
    ┌───────────────┐  ┌────────────┐  ┌──────────┐  ┌─────────┐
-   │   Supabase    │  │ Cloudinary │  │Wikipedia │  │  Vercel │
-   │ Auth + DB     │  │  Avatars   │  │  API     │  │ Hosting │
-   └───────────────┘  └────────────┘  └──────────┘  └─────────┘
+   │  Express API  │  │ Cloudinary │  │Wikipedia │  │  Vercel │
+   │  (JWT Auth +  │  │  Avatars   │  │  API     │  │ Hosting │
+   │   Favorites)  │  └────────────┘  └──────────┘  └─────────┘
+   └───────────────┘
 ```
 
 ## Frontend Module Responsibilities
@@ -34,21 +35,21 @@
 
 | Module | Responsibility |
 |--------|---------------|
-| **home/** | Landing page with hero section and `HomeCarousel` showcasing featured stars. Entry point for unauthenticated users. |
+| **home/** | Landing page with hero section and `HomeCarousel` showcasing featured stars. Entry point for unauthenticated users. Includes Demo Mode ("Try as Guest") entry point. |
 | **stars/** | Core catalog feature: star listing with Fuse.js search, filtering, sorting, pagination, and individual star detail views with Wikipedia summaries. Contains the HYG star data (`data/stars.json`), astronomy utilities, and Wikipedia service. |
-| **favorites/** | Displays user's saved stars. Reads from Supabase `user_favorites` table via `useFavorites` hook. Requires authentication. |
+| **favorites/** | Displays user's saved stars. In authenticated mode, reads from the Express API via `useFavorites`. In Demo Mode, reads from `localStorage` under `demoFavorites`. |
 | **dashboard/** | Authenticated user dashboard providing an overview of activity and quick access to favorites and profile. |
 | **profile/** | User profile management including Cloudinary-powered avatar upload (unsigned preset). Requires authentication. |
-| **galactic-map/** | Placeholder stub. Route exists but no business logic implemented. Awaiting design and backend support. |
+| **galactic-map/** | Interactive 3-D star map with multi-stop path plotting, warp-drive camera transitions, HUD target-locking, and manual camera override. |
 
 ### Shared Layers
 
 | Module | Responsibility |
 |--------|---------------|
-| **hooks/** | Cross-cutting data hooks: `useStars` (Fuse.js search + filter + sort + paginate), `useFavorites` (Supabase CRUD for saved stars), `useWikipediaSummary` (Wikipedia REST API fetch). |
+| **hooks/** | Cross-cutting data hooks: `useStars` (Fuse.js search + filter + sort + paginate), `useFavorites` (Express API CRUD or localStorage in Demo Mode), `useWikipediaSummary` (Wikipedia REST API fetch), `useUser` (thin wrapper over `useAuth()`). |
 | **components/** | Shared UI primitives used across features (e.g., `Starfield` background, `ProtectedRoute`). |
-| **context/** | `UserContext.tsx` wraps the app with Supabase auth state, exposing the `useUser()` hook as the single public API for auth. |
-| **lib/** | `supabaseClient.ts` — singleton Supabase client instance. Accessed only by hooks, never directly by components. |
+| **app/context/** | `AuthContext.tsx` manages auth state (JWT + user), Demo Mode state (`isDemoMode`), and exposes `useAuth()`. `useUser()` in `src/hooks/useUser.ts` is the approved public hook for components. |
+| **lib/** | `supabaseClient.ts` — legacy Supabase client, retained for any remaining Supabase-backed operations (e.g., avatar storage). Not used for auth or favorites. |
 
 ## Data Flow
 
@@ -60,25 +61,43 @@ stars.json (HYG catalog, ~119K stars)
     → Filter by constellation, spectral class
     → Sort by distance, magnitude, name
     → Paginate
-  → StarsList / StarDetail components
+  → StarsList / StarDetail / GalacticMap components
 ```
 
 ### Authentication
 ```
-Supabase Auth (email/password, OAuth)
-  → UserContext.tsx (onAuthStateChange listener)
-    → useUser() hook
-      → All features that need auth state
+Real user:
+  POST /api/auth/login  or  POST /api/auth/register  (Express API)
+    → JWT token + AuthUser object returned
+      → AuthContext.tsx stores token + user in localStorage
+        → useUser() / useAuth() expose to components
+
+Demo user ("Hotel Key"):
+  startDemo() in AuthContext.tsx
+    → Synthetic AuthUser created (id: demo_<timestamp>)
+    → demoSession object (user + demoCreatedAt) written to localStorage
+    → 48-hour TTL enforced on next mount; expired sessions auto-cleared
+    → isDemoMode = true, token = null
+
 ProtectedRoute wraps authenticated routes (routing guard only, not a security boundary)
 ```
 
 ### Favorites
 ```
-User action (toggle favorite)
-  → useFavorites hook
-    → Supabase PostgreSQL: INSERT/DELETE on user_favorites table
-    → Re-fetch user's favorites list
-  → FavoritesList component
+Authenticated user:
+  User action (toggle favorite)
+    → useFavorites hook
+      → POST /api/favorites/toggle (Bearer JWT)
+      → Updates local state
+    → FavoritesList component
+
+Demo user:
+  User action (toggle favorite)
+    → useFavorites hook (isDemoMode branch)
+      → Read/write localStorage['demoFavorites']
+      → Updates local state
+    → FavoritesList component
+  (Cleared on logout or when demo session expires)
 ```
 
 ### Wikipedia Summaries
@@ -102,19 +121,21 @@ Profile page
 
 | Service | Purpose | Config Mechanism | Auth |
 |---------|---------|-----------------|------|
-| Supabase | Auth + PostgreSQL (user_favorites) | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | Anon key (RLS enforced) |
+| strawberry-star-server | Auth (JWT) + Favorites API | `VITE_API_URL` | Bearer JWT |
 | Cloudinary | Avatar image upload | `VITE_CLOUDINARY_CLOUD_NAME`, `VITE_CLOUDINARY_UPLOAD_PRESET` | Unsigned preset |
 | Wikipedia | Star article summaries | Public REST API | None |
 | Vercel | Static SPA hosting | `vercel.json` (catch-all rewrite) | Git integration |
 
+> **Note:** Supabase is no longer used for auth or favorites. `supabaseClient.ts` is retained only for any remaining legacy operations and will be removed when fully deprecated.
+
 ## Dependency Rules (Frontend)
 
 ```
-src/lib/supabaseClient.ts          ← Lowest level, no app imports
+src/app/context/AuthContext.tsx    ← Auth state; no app imports
         ↓
-src/context/UserContext.tsx         ← Wraps Supabase auth, exports useUser()
-        ↓
-src/hooks/*                        ← Data layer (useStars, useFavorites, etc.)
+src/hooks/useUser.ts               ← Thin public wrapper (exposes user, loading, isDemoMode)
+src/hooks/useFavorites.ts          ← Branches on isDemoMode: API vs localStorage
+src/hooks/useStars.ts              ← Pure client-side, no auth dependency
         ↓
 src/features/**                    ← Leaf nodes — consume hooks + shared components
         ↑
@@ -124,20 +145,25 @@ src/components/*                   ← Shared UI, imported by any feature
 **Rules:**
 - Features MUST NOT import from other features
 - Components MUST NOT import from features
-- Only hooks may access `supabaseClient` — components use `useUser()` for auth
+- Components access auth ONLY via `useUser()` — never import `AuthContext` directly
 - `useWikipediaSummary` is the only module that calls the Wikipedia API
+- Never send `Authorization` headers when `isDemoMode` is true
 
-## Upcoming Evolution
+## Backend: strawberry-star-server
 
-### Migration from Supabase to Node.js/Express Backend
+```
+strawberry-star-server/
+  src/
+    routes/       ← auth.ts (login, register), favorites.ts
+    middleware/   ← authenticate.ts (JWT verification)
+    types/        ← shared TypeScript interfaces
+  app.ts          ← Express app, NO listen() — exported for testing
+  server.ts       ← calls app.listen(); entry point for runtime
+```
 
-The project is moving away from Supabase as the primary backend:
-
-- **`strawberry-star-server/`** will be a Node.js/Express backend, built as a sibling directory to the frontend. It does not exist yet.
-- The backend will eventually take over data and auth responsibilities currently handled by Supabase directly from the frontend.
-- The frontend will call the Express API instead of Supabase directly. The migration path is TBD — expect a transitional period where both Supabase and the Express API coexist.
-- **Galactic Map** is a planned feature awaiting backend support. The route exists as a stub in the frontend; do not add business logic to it without explicit instruction.
-- The Supabase service role key must never be exposed to the frontend — it will live exclusively in the backend's server-side environment variables.
+- `module: NodeNext`, `moduleResolution: NodeNext` — all imports use `.js` extensions
+- Tests use supertest against `app` directly; no listen() in tests
+- `jsonwebtoken` is CJS-only — import as `import jwt from "jsonwebtoken"`, then destructure
 
 ## 🐱 Appendix: Quality Control & Emotional Support
 
@@ -148,4 +174,4 @@ The project follows a strict dual-oversight protocol provided by the resident fe
 | **Strawberry** | VP of Happiness & Code Review | Sits in her soft warm cat bed daily; purring is a required background service for successful builds. |
 | **PingFoot** | Director of Moral Support | Participates selectively; primary focus is on resource allocation (specifically ten meals a day). |
 
-**Architectural Note:** The "visual breathing room" and "calm UI" philosophy is directly inspired by Strawberry’s preference for peaceful, clutter-free environments.
+**Architectural Note:** The "visual breathing room" and "calm UI" philosophy is directly inspired by Strawberry's preference for peaceful, clutter-free environments.

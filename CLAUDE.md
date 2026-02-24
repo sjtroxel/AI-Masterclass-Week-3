@@ -38,16 +38,16 @@ ai-class-week-3/                          # Workspace root (git root)
 │   │   │   │   ├── services/wikipedia.ts
 │   │   │   │   ├── utils/astronomy.ts
 │   │   │   │   └── tests/
-│   │   │   ├── favorites/                # Supabase-backed saved stars
+│   │   │   ├── favorites/                # API-backed saved stars
 │   │   │   ├── dashboard/                # User dashboard
 │   │   │   ├── profile/                  # Profile + Cloudinary avatar
-│   │   │   └── galactic-map/             # Stub — not yet implemented
+│   │   │   └── galactic-map/             # Interactive 3-D star map with camera controls
 │   │   ├── hooks/                        # Shared hooks
 │   │   │   ├── useStars.ts
 │   │   │   ├── useFavorites.ts
 │   │   │   └── useWikipediaSummary.ts
 │   │   ├── components/                   # Shared UI components
-│   │   ├── context/UserContext.tsx        # Auth state via useUser()
+│   │   ├── app/context/AuthContext.tsx   # Auth state via useUser() / useAuth()
 │   │   ├── lib/supabaseClient.ts         # Singleton Supabase client
 │   │   └── main.tsx                      # Entry point + router
 │   ├── package.json
@@ -135,7 +135,17 @@ chore/<short-description>
 - **Features must NOT import from other features** — `src/features/stars/` cannot import from `src/features/favorites/`
 - **`useUser()` is the only approved way to access auth state** — never import `supabaseClient` directly in components
 - **Do NOT commit automatically** — always recommend the git command + Conventional Commits message for the user to run
-- **Galactic Map is a stub** — do not add business logic to it without explicit instruction
+
+### Demo Mode (Hotel Key)
+
+Demo Mode lets unauthenticated visitors explore the app without registering. Understand the design before touching auth or favorites:
+
+- `startDemo()` in `AuthContext.tsx` creates a synthetic guest user and persists a `demoSession` object (with a `demoCreatedAt` timestamp) to `localStorage`
+- The session TTL is **48 hours** — `AuthContext` checks `Date.now() - demoCreatedAt < DEMO_TTL_MS` on mount and auto-clears expired sessions
+- `isDemoMode: boolean` is exposed by both `useUser()` and `useAuth()` — **always check this flag before making API calls**
+- Demo favorites are stored in `localStorage` under the `demoFavorites` key; `useFavorites` already branches on `isDemoMode` — do not add a second code path
+- Calling `login()`, `register()`, or `logout()` always clears `demoSession` and `demoFavorites` from `localStorage`
+- Demo users have no real JWT (`token` is `null`) — never send `Authorization` headers in demo mode
 
 ## Maintenance
 

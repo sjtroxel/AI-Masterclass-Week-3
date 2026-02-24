@@ -4,7 +4,6 @@
 - The `supabaseClient` singleton is accessed only through hooks (`useFavorites`, etc.), never directly in UI
 
 ## Frontend
-- Do not add business logic to `galactic-map/` — it is a placeholder stub awaiting design
 - Do not fetch star data from a server — the HYG catalog is client-side only in `stars.json`
 - Do not call the Wikipedia API outside of `useWikipediaSummary` hook
 
